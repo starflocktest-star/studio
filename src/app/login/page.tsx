@@ -16,6 +16,8 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useRouter } from 'next/navigation';
 
 const loginFormSchema = z.object({
   email: z.string().email({
@@ -24,6 +26,9 @@ const loginFormSchema = z.object({
   password: z.string().min(1, {
     message: 'Password is required.',
   }),
+  role: z.enum(['fan', 'influencer'], {
+    required_error: 'You need to select a role.',
+  }),
 });
 
 type LoginFormValues = z.infer<typeof loginFormSchema>;
@@ -31,10 +36,12 @@ type LoginFormValues = z.infer<typeof loginFormSchema>;
 const defaultValues: LoginFormValues = {
   email: '',
   password: '',
+  role: 'fan',
 };
 
 export default function LoginPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginFormSchema),
     defaultValues,
@@ -46,7 +53,14 @@ export default function LoginPage() {
       title: 'Logged In!',
       description: 'Welcome back to StarConnect.',
     });
-    // Here you would typically redirect the user
+
+    // In a real app, you would handle auth and then redirect.
+    // Here we simulate the redirect based on role.
+    if (data.role === 'influencer') {
+      router.push('/creator-dashboard');
+    } else {
+      router.push('/dashboard');
+    }
   }
 
   return (
@@ -80,6 +94,36 @@ export default function LoginPage() {
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Login as...</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex space-x-4"
+                      >
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="fan" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Fan</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="influencer" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Influencer</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
