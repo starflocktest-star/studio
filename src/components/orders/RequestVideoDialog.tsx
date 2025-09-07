@@ -11,14 +11,15 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { LogIn } from 'lucide-react';
 
 const formSchema = z.object({
   fanName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -34,6 +35,14 @@ interface RequestVideoDialogProps {
 export default function RequestVideoDialog({ price, influencerName }: RequestVideoDialogProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
+  // Mock authentication state. In a real app, you'd use a context or state manager.
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,6 +61,24 @@ export default function RequestVideoDialog({ price, influencerName }: RequestVid
     });
     setOpen(false);
     form.reset();
+  }
+
+  if (!isClient) {
+    return (
+       <Button size="lg" className="w-full md:w-auto bg-accent hover:bg-accent/90 text-white font-bold" disabled>
+          Request for ${price}
+        </Button>
+    )
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <Button asChild size="lg" className="w-full md:w-auto font-bold">
+        <Link href="/login">
+            <LogIn /> Login to Request
+        </Link>
+      </Button>
+    );
   }
 
   return (

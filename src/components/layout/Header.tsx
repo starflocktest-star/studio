@@ -4,19 +4,28 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Star, User } from 'lucide-react';
+import { LogIn, Menu, Star, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
 
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/influencers', label: 'Influencers' },
-  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/dashboard', label: 'My Requests' },
   { href: '/register', label: 'For Influencers'},
 ];
 
 export default function Header() {
   const pathname = usePathname();
+  // Mock authentication state. In a real app, you'd use a context or state manager.
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const NavLinks = ({ className }: { className?: string }) => (
     <nav className={cn('flex items-center gap-4', className)}>
@@ -47,11 +56,23 @@ export default function Header() {
           <NavLinks />
         </div>
 
-        <div className="flex items-center gap-4">
-            <Button size="icon" variant="ghost">
-                <User className="h-5 w-5" />
-                <span className="sr-only">Profile</span>
-            </Button>
+        <div className="flex items-center gap-2">
+            {isClient && (
+              isLoggedIn ? (
+                <Button size="icon" variant="ghost" onClick={() => setIsLoggedIn(false)} title="Sign Out (dev)">
+                    <User className="h-5 w-5" />
+                    <span className="sr-only">Profile</span>
+                </Button>
+              ) : (
+                <Button asChild variant="ghost">
+                  <Link href="/login">
+                    <LogIn />
+                    <span className="ml-2 hidden sm:inline">Login</span>
+                  </Link>
+                </Button>
+              )
+            )}
+
 
             <Sheet>
             <SheetTrigger asChild>
@@ -62,7 +83,7 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="bg-background">
                 <div className="flex flex-col gap-6 pt-10">
-                    <NavLinks className="flex-col text-lg" />
+                    <NavLinks className="flex-col text-lg items-start" />
                 </div>
             </SheetContent>
             </Sheet>
