@@ -34,6 +34,8 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>('fan');
   const [isClient, setIsClient] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+
 
   useEffect(() => {
     setIsClient(true);
@@ -57,16 +59,21 @@ export default function Header() {
   const handleLogout = () => {
     setIsLoggedIn(false);
     router.push('/');
+    setIsSheetOpen(false);
+  }
+
+  const handleLinkClick = () => {
+    setIsSheetOpen(false);
   }
 
 
-  const NavLinks = ({ className, onLinkClick }: { className?: string, onLinkClick?: () => void }) => (
+  const NavLinks = ({ className }: { className?: string }) => (
     <nav className={cn('flex items-center gap-4', className)}>
       {navLinks.map((link) => (
         <Link
           key={link.href}
           href={link.href}
-          onClick={onLinkClick}
+          onClick={handleLinkClick}
           className={cn(
             'text-sm font-medium transition-colors hover:text-primary',
             pathname === link.href ? 'text-primary' : 'text-muted-foreground'
@@ -81,12 +88,12 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold font-headline text-lg">
+        <Link href="/" className="flex items-center gap-2 font-bold font-headline text-lg" onClick={handleLinkClick}>
           <Star className="w-6 h-6 text-primary" />
           <span>StarConnect</span>
         </Link>
 
-        {(!isLoggedIn || userRole !== 'influencer') && (
+        {isClient && (!isLoggedIn || userRole !== 'influencer') && (
           <div className="hidden md:flex items-center gap-6">
             <NavLinks />
           </div>
@@ -137,17 +144,19 @@ export default function Header() {
                 </DropdownMenu>
 
               ) : (
-                <Button asChild variant="ghost">
-                  <Link href="/login">
-                    <LogIn />
-                    <span className="ml-2 hidden sm:inline">Login</span>
-                  </Link>
-                </Button>
+                <div className="hidden md:flex">
+                  <Button asChild variant="ghost">
+                    <Link href="/login">
+                      <LogIn />
+                      <span className="ml-2 hidden sm:inline">Login</span>
+                    </Link>
+                  </Button>
+                </div>
               )
             )}
 
 
-            <Sheet>
+            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-6 w-6" />
@@ -156,23 +165,33 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="bg-background">
                 <div className="flex flex-col gap-6 pt-10">
-                  {(!isLoggedIn || userRole !== 'influencer') && (
-                    <NavLinks className="flex-col text-lg items-start" />
+                  {isClient && !isLoggedIn && (
+                    <>
+                      <NavLinks className="flex-col text-lg items-start" />
+                       <Button asChild variant="outline" className="w-full justify-start text-lg font-medium">
+                        <Link href="/login" onClick={handleLinkClick}>
+                          <LogIn /> Login
+                        </Link>
+                      </Button>
+                    </>
+                  )}
+                  {isClient && isLoggedIn && userRole === 'fan' && (
+                     <NavLinks className="flex-col text-lg items-start" />
                   )}
                      {isClient && isLoggedIn && (
                        <>
                         {userRole === 'fan' && (
-                          <Link href="/dashboard" className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
+                          <Link href="/dashboard" onClick={handleLinkClick} className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
                             My Requests
                           </Link>
                         )}
                         {userRole === 'influencer' && (
-                          <Link href="/creator-dashboard" className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
+                          <Link href="/creator-dashboard" onClick={handleLinkClick} className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
                               Creator Dashboard
                           </Link>
                         )}
                          {userRole === 'admin' && (
-                          <Link href="/admin" className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
+                          <Link href="/admin" onClick={handleLinkClick} className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
                               Admin Panel
                           </Link>
                         )}
