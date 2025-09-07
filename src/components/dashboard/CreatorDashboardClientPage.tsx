@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, Upload, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ProfileSettingsForm from './ProfileSettingsForm';
 
 interface CreatorDashboardClientPageProps {
   orders: Order[];
@@ -18,6 +19,9 @@ interface CreatorDashboardClientPageProps {
 
 export default function CreatorDashboardClientPage({ orders: initialOrders, influencers }: CreatorDashboardClientPageProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
+  // In a real app, you would get the single logged-in influencer.
+  // For now, we'll just pick the first one from the list to simulate this.
+  const [influencer, setInfluencer] = useState<Influencer>(influencers[0]); 
   const { toast } = useToast();
 
   const handleUpdateStatus = (orderId: string, newStatus: OrderStatus) => {
@@ -35,20 +39,24 @@ export default function CreatorDashboardClientPage({ orders: initialOrders, infl
         description: `Video for order #${orderId.slice(3)} has been uploaded.`
     });
   }
+  
+  const handleProfileUpdate = (updatedProfile: Influencer) => {
+    setInfluencer(updatedProfile);
+  }
 
   const OrderCard = ({ order }: { order: Order }) => {
-    const influencer = influencers.find(i => i.id === order.influencerId);
-    if (!influencer) return null;
+    const influencerForOrder = influencers.find(i => i.id === order.influencerId);
+    if (!influencerForOrder) return null;
     
     return (
       <Card>
         <CardHeader>
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle className="font-headline text-lg">For {influencer.name}</CardTitle>
+              <CardTitle className="font-headline text-lg">For {influencerForOrder.name}</CardTitle>
               <CardDescription>Request from {order.fanName} on {order.requestDate}</CardDescription>
             </div>
-            <Image src={influencer.imageUrl} alt={influencer.name} width={64} height={64} className="rounded-full" data-ai-hint={influencer['data-ai-hint']}/>
+            <Image src={influencerForOrder.imageUrl} alt={influencerForOrder.name} width={64} height={64} className="rounded-full" data-ai-hint={influencerForOrder['data-ai-hint']}/>
           </div>
         </CardHeader>
         <CardContent>
@@ -83,7 +91,8 @@ export default function CreatorDashboardClientPage({ orders: initialOrders, infl
   };
 
   const renderOrders = (status: OrderStatus) => {
-    const filteredOrders = orders.filter(o => o.status === status);
+    // We'll filter orders for the simulated logged-in influencer
+    const filteredOrders = orders.filter(o => o.status === status && o.influencerId === influencer.id);
     return filteredOrders.length > 0 ? (
       <div className="grid gap-6 md:grid-cols-2">
         {filteredOrders.map(order => <OrderCard key={order.id} order={order} />)}
@@ -95,16 +104,20 @@ export default function CreatorDashboardClientPage({ orders: initialOrders, infl
 
   return (
     <Tabs defaultValue="pending" className="w-full">
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="grid w-full grid-cols-5">
         <TabsTrigger value="pending">Pending</TabsTrigger>
         <TabsTrigger value="in-progress">In Progress</TabsTrigger>
         <TabsTrigger value="completed">Completed</TabsTrigger>
         <TabsTrigger value="rejected">Rejected</TabsTrigger>
+        <TabsTrigger value="profile">Profile</TabsTrigger>
       </TabsList>
       <TabsContent value="pending">{renderOrders('Pending')}</TabsContent>
       <TabsContent value="in-progress">{renderOrders('In Progress')}</TabsContent>
       <TabsContent value="completed">{renderOrders('Completed')}</TabsContent>
       <TabsContent value="rejected">{renderOrders('Rejected')}</TabsContent>
+      <TabsContent value="profile">
+        <ProfileSettingsForm influencer={influencer} onProfileUpdate={handleProfileUpdate} />
+      </TabsContent>
     </Tabs>
   );
 }
