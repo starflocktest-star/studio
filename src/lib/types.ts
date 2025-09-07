@@ -54,5 +54,5 @@ export interface User {
     id: string;
     name: string;
     email: string;
-    role: 'fan' | 'influencer';
+    role: 'fan' | 'influencer' | 'admin';
 }

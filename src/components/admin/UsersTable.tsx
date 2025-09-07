@@ -43,6 +43,7 @@ export default function UsersTable({ users }: UsersTableProps) {
                     variant={user.role === 'influencer' ? 'default' : 'outline'}
                     className={cn({
                         'bg-blue-500/10 text-blue-400 border-blue-500/20': user.role === 'influencer',
+                        'bg-purple-500/10 text-purple-400 border-purple-500/20': user.role === 'admin',
                     })}
                    >
                     {user.role}

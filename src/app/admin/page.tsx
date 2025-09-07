@@ -10,6 +10,7 @@ const allUsers: User[] = [
     { id: 'user4', name: 'Emily', email: 'emily@example.com', role: 'fan' },
     { id: 'user5', name: 'James', email: 'james@example.com', role: 'fan' },
     { id: 'user6', name: 'Chloe', email: 'chloe@example.com', role: 'fan' },
+    { id: 'admin1', name: 'Admin User', email: 'admin@example.com', role: 'admin' },
     ...influencers.map(i => ({ id: i.id, name: i.name, email: `${i.name.toLowerCase().replace(' ', '.')}@example.com`, role: 'influencer' }))
 ];
 
