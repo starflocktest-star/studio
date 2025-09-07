@@ -1,6 +1,10 @@
 import AdminDashboardClientPage from '@/components/admin/AdminDashboardClientPage';
 import { influencers, orders } from '@/lib/data';
 import type { User } from '@/lib/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { Shield } from 'lucide-react';
 
 // In a real app, you'd fetch all users.
 const allUsers: User[] = [
@@ -14,8 +18,33 @@ const allUsers: User[] = [
     ...influencers.map(i => ({ id: i.id, name: i.name, email: `${i.name.toLowerCase().replace(' ', '.')}@example.com`, role: 'influencer' }))
 ];
 
+// In a real app, this would be a server-side check for an authenticated admin session.
+// For this prototype, we'll simulate it being true. A value of `false` would show the login prompt.
+const isAdminLoggedIn = true; 
+
 
 export default function AdminDashboardPage() {
+  if (!isAdminLoggedIn) {
+      return (
+          <div className="container mx-auto px-4 py-12 flex items-center justify-center min-h-[calc(100vh-200px)]">
+              <Card className="max-w-md w-full text-center">
+                  <CardHeader>
+                      <div className="mx-auto bg-primary/10 text-primary p-3 rounded-full w-fit">
+                          <Shield className="h-8 w-8" />
+                      </div>
+                      <CardTitle className="text-3xl font-headline mt-4">Admin Access Required</CardTitle>
+                      <CardDescription>You must be logged in as an administrator to view this page.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                      <Button asChild size="lg" className="w-full">
+                          <Link href="/admin/login">Proceed to Admin Login</Link>
+                      </Button>
+                  </CardContent>
+              </Card>
+          </div>
+      )
+  }
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <header className="mb-8">
