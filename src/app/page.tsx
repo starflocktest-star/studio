@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import InfluencerCard from '@/components/influencers/InfluencerCard';
@@ -21,7 +22,7 @@ export default function Home() {
             <Link href="/influencers">Browse Influencers</Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 hover:text-primary">
-            <Link href="/dashboard">For Influencers</Link>
+            <Link href="/register">For Influencers</Link>
           </Button>
         </div>
       </section>
