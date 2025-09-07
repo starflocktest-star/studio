@@ -21,6 +21,7 @@ export const influencers: Influencer[] = [
       youtube: '#',
     },
     reviews: [reviews[0], reviews[1]],
+    status: 'Approved',
   },
   {
     id: '2',
@@ -35,6 +36,7 @@ export const influencers: Influencer[] = [
       tiktok: '#',
     },
     reviews: [reviews[2]],
+    status: 'Approved',
   },
   {
     id: '3',
@@ -49,6 +51,7 @@ export const influencers: Influencer[] = [
       youtube: '#',
     },
     reviews: [],
+    status: 'Approved',
   },
   {
     id: '4',
@@ -63,6 +66,7 @@ export const influencers: Influencer[] = [
       twitter: '#',
     },
     reviews: [reviews[0]],
+    status: 'Approved',
   },
     {
     id: '5',
@@ -77,6 +81,7 @@ export const influencers: Influencer[] = [
       youtube: '#',
     },
     reviews: [reviews[1], reviews[2]],
+    status: 'Pending',
   },
   {
     id: '6',
@@ -90,6 +95,7 @@ export const influencers: Influencer[] = [
       instagram: '#',
     },
     reviews: [],
+    status: 'Approved',
   },
   {
     id: '7',
@@ -103,6 +109,7 @@ export const influencers: Influencer[] = [
       youtube: '#',
     },
     reviews: [reviews[0]],
+    status: 'Approved',
   },
   {
     id: '8',
@@ -117,6 +124,7 @@ export const influencers: Influencer[] = [
       tiktok: '#',
     },
     reviews: [reviews[2], reviews[0]],
+    status: 'Rejected',
   },
 ];
 
@@ -129,4 +137,4 @@ export const orders: Order[] = [
   { id: 'ord6', influencerId: '8', fanName: 'Chloe', occasion: 'Birthday', description: 'Sing a short happy birthday song for my daughter.', status: 'In Progress', requestDate: '2023-10-28' },
 ];
 
-export const categories = [...new Set(influencers.map(i => i.category))];
+export const categories = [...new Set(influencers.filter(i => i.status === 'Approved').map(i => i.category))];

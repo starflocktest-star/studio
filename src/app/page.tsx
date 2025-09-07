@@ -6,7 +6,7 @@ import { influencers } from '@/lib/data';
 import type { Influencer } from '@/lib/types';
 
 export default function Home() {
-  const featuredInfluencers = influencers.slice(0, 4);
+  const featuredInfluencers = influencers.filter(i => i.status === 'Approved').slice(0, 4);
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">

@@ -13,6 +13,8 @@ export interface Review {
   date: string;
 }
 
+export type InfluencerStatus = 'Pending' | 'Approved' | 'Rejected';
+
 export interface Influencer {
   id: string;
   name: string;
@@ -23,6 +25,7 @@ export interface Influencer {
   'data-ai-hint'?: string;
   socials: SocialLinks;
   reviews: Review[];
+  status: InfluencerStatus;
 }
 
 export type OrderStatus = 'Pending' | 'In Progress' | 'Completed' | 'Rejected';
