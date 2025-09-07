@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -23,6 +24,7 @@ import { LogIn, Paperclip, X } from 'lucide-react';
 import type { Service } from '@/lib/types';
 import Image from 'next/image';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   fanName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -41,7 +43,7 @@ interface RequestVideoDialogProps {
 }
 
 export default function RequestVideoDialog({ service, influencerName, triggerButton }: RequestVideoDialogProps) {
-  const { toast } = useToast();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -87,13 +89,15 @@ export default function RequestVideoDialog({ service, influencerName, triggerBut
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log('Video request submitted for service', service.name, ':', values);
-    toast({
-      title: 'Payment Successful!',
-      description: `Your request for "${service.name}" from ${influencerName} has been sent.`,
-    });
-    setOpen(false);
-    form.reset();
-    clearFile();
+    
+    const queryParams = new URLSearchParams({
+        serviceName: service.name,
+        influencerName: influencerName,
+        price: service.price.toString(),
+        paymentMethod: values.paymentMethod,
+    }).toString();
+
+    router.push(`/payment?${queryParams}`);
   }
 
   if (!isClient) {
