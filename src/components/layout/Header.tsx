@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { LogIn, Menu, Star, User, LayoutDashboard, LogOut, Video, ShieldCheck } from 'lucide-react';
+import { LogIn, Menu, Star, User, LayoutDashboard, LogOut, Video, ShieldCheck, LifeBuoy } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -93,7 +93,7 @@ export default function Header() {
           <span>StarConnect</span>
         </Link>
 
-        {isClient && (!isLoggedIn || userRole === 'fan') && (
+        {isClient && !pathname.startsWith('/admin') && (!isLoggedIn || userRole === 'fan' || userRole === 'influencer') && (
           <div className="hidden md:flex items-center gap-6">
             <NavLinks />
           </div>
@@ -122,9 +122,17 @@ export default function Header() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                      {userRole === 'fan' && (
-                        <DropdownMenuItem asChild>
-                            <Link href="/dashboard"><LayoutDashboard/>My Requests</Link>
-                        </DropdownMenuItem>
+                        <>
+                          <DropdownMenuItem asChild>
+                              <Link href="/dashboard"><LayoutDashboard/>My Requests</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                              <Link href="/dashboard/profile"><User/>Profile</Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                              <Link href="/dashboard/help"><LifeBuoy/>Help & Support</Link>
+                          </DropdownMenuItem>
+                        </>
                      )}
                       {userRole === 'influencer' && (
                         <DropdownMenuItem asChild>
@@ -175,15 +183,23 @@ export default function Header() {
                       </Button>
                     </>
                   )}
-                  {isClient && isLoggedIn && userRole === 'fan' && (
+                  {isClient && isLoggedIn && (userRole === 'fan' || userRole === 'influencer') && !pathname.startsWith('/admin') && (
                      <NavLinks className="flex-col text-lg items-start" />
                   )}
                      {isClient && isLoggedIn && (
                        <>
                         {userRole === 'fan' && (
-                          <Link href="/dashboard" onClick={handleLinkClick} className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
-                            My Requests
-                          </Link>
+                          <>
+                            <Link href="/dashboard" onClick={handleLinkClick} className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
+                              My Requests
+                            </Link>
+                            <Link href="/dashboard/profile" onClick={handleLinkClick} className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
+                              Profile
+                            </Link>
+                             <Link href="/dashboard/help" onClick={handleLinkClick} className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
+                              Help & Support
+                            </Link>
+                          </>
                         )}
                         {userRole === 'influencer' && (
                           <Link href="/creator-dashboard" onClick={handleLinkClick} className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">

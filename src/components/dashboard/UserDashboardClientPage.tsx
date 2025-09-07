@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Influencer, Order, OrderStatus } from '@/lib/types';
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { Download, Film } from 'lucide-react';
+import { Download, Film, CheckCircle, Clock, Hourglass, XCircle } from 'lucide-react';
 import Link from 'next/link';
 
 interface UserDashboardClientPageProps {
@@ -14,25 +15,60 @@ interface UserDashboardClientPageProps {
   influencers: Influencer[];
 }
 
+const statusSteps: OrderStatus[] = ['Pending', 'In Progress', 'Completed'];
+
+const StatusTracker = ({ currentStatus }: { currentStatus: OrderStatus }) => {
+  if (currentStatus === 'Rejected') {
+    return (
+      <div className="flex items-center gap-2 mt-4 text-destructive">
+        <XCircle className="w-5 h-5" />
+        <p className="font-semibold">Request Rejected</p>
+      </div>
+    );
+  }
+
+  const currentIndex = statusSteps.indexOf(currentStatus);
+
+  return (
+    <div className="flex items-center w-full mt-4">
+      {statusSteps.map((status, index) => {
+        const isActive = index <= currentIndex;
+        return (
+          <React.Fragment key={status}>
+            <div className="flex flex-col items-center">
+              <div
+                className={cn(
+                  'w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300',
+                  isActive ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                )}
+              >
+                {status === 'Pending' && <Hourglass className="w-4 h-4" />}
+                {status === 'In Progress' && <Clock className="w-4 h-4" />}
+                {status === 'Completed' && <CheckCircle className="w-4 h-4" />}
+              </div>
+              <p className={cn('text-xs mt-2', isActive ? 'font-semibold text-foreground' : 'text-muted-foreground')}>
+                {status}
+              </p>
+            </div>
+            {index < statusSteps.length - 1 && (
+              <div className={cn(
+                'flex-1 h-1 transition-colors duration-300',
+                 (isActive && index < currentIndex) ? 'bg-primary' : 'bg-muted'
+                )} />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </div>
+  );
+};
+
+
 export default function UserDashboardClientPage({ orders, influencers }: UserDashboardClientPageProps) {
 
   const OrderCard = ({ order }: { order: Order }) => {
     const influencer = influencers.find(i => i.id === order.influencerId);
     if (!influencer) return null;
-
-    const getStatusInfo = (status: OrderStatus) => {
-        switch (status) {
-            case 'Pending':
-                return { className: 'bg-blue-500/10 text-blue-400 border-blue-500/20', description: 'Your request is awaiting confirmation.' };
-            case 'In Progress':
-                return { className: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20', description: 'The creator is working on your video.' };
-            case 'Completed':
-                return { className: 'bg-green-500/10 text-green-400 border-green-500/20', description: 'Your video is ready!' };
-            case 'Rejected':
-                return { className: 'bg-red-500/10 text-red-400 border-red-500/20', description: 'This request was rejected.' };
-        }
-    }
-    const statusInfo = getStatusInfo(order.status);
     
     return (
       <Card className="flex flex-col">
@@ -48,12 +84,14 @@ export default function UserDashboardClientPage({ orders, influencers }: UserDas
           </div>
         </CardHeader>
         <CardContent className="flex-grow">
-          <p className="text-sm text-muted-foreground">{statusInfo.description}</p>
+           <div className="space-y-1 text-sm text-muted-foreground">
+            <p><span className="font-semibold text-foreground">Service:</span> {influencers.flatMap(i => i.services).find(s => s.id === order.serviceId)?.name}</p>
+            <p><span className="font-semibold text-foreground">Instructions:</span> {order.description}</p>
+            <p><span className="font-semibold text-foreground">Order ID:</span> #{order.id.slice(3)}</p>
+          </div>
+          <StatusTracker currentStatus={order.status} />
         </CardContent>
-        <CardFooter className="flex justify-between items-center">
-            <Badge variant="outline" className={cn('font-semibold', statusInfo.className)}>
-                {order.status}
-            </Badge>
+        <CardFooter className="flex justify-end items-center">
             {order.status === 'Completed' && order.videoUrl && (
                 <Button asChild size="sm">
                     <a href={order.videoUrl} download>
@@ -72,7 +110,7 @@ export default function UserDashboardClientPage({ orders, influencers }: UserDas
   };
 
   return orders.length > 0 ? (
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
         {orders.map(order => <OrderCard key={order.id} order={order} />)}
       </div>
     ) : (
