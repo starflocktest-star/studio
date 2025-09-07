@@ -1,6 +1,7 @@
 
 'use client';
 
+import * as React from 'react';
 import type { Influencer, Order, OrderStatus } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
