@@ -37,3 +37,10 @@ export interface Order {
   requestDate: string;
   videoUrl?: string;
 }
+
+export interface User {
+    id: string;
+    name: string;
+    email: string;
+    role: 'fan' | 'influencer';
+}
