@@ -20,21 +20,20 @@ import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const profileFormSchema = z.object({
-  price: z.coerce.number().min(1, { message: 'Price must be at least $1.' }),
   bio: z.string().min(20, {
     message: 'Bio must be at least 20 characters.',
   }),
-  instagram: z.string().optional(),
-  twitter: z.string().optional(),
-  youtube: z.string().optional(),
-  tiktok: z.string().optional(),
+  instagram: z.string().url().optional().or(z.literal('')),
+  twitter: z.string().url().optional().or(z.literal('')),
+  youtube: z.string().url().optional().or(z.literal('')),
+  tiktok: z.string().url().optional().or(z.literal('')),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 interface ProfileSettingsFormProps {
   influencer: Influencer;
-  onProfileUpdate: (data: Influencer) => void;
+  onProfileUpdate: (data: Partial<Influencer>) => void;
 }
 
 export default function ProfileSettingsForm({ influencer, onProfileUpdate }: ProfileSettingsFormProps) {
@@ -42,7 +41,6 @@ export default function ProfileSettingsForm({ influencer, onProfileUpdate }: Pro
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      price: influencer.price,
       bio: influencer.bio,
       instagram: influencer.socials.instagram || '',
       twitter: influencer.socials.twitter || '',
@@ -52,13 +50,9 @@ export default function ProfileSettingsForm({ influencer, onProfileUpdate }: Pro
   });
 
   function onSubmit(data: ProfileFormValues) {
-    console.log(data);
-
     // In a real app, you would send this to your backend.
     // Here, we'll just update the parent component's state.
-    const updatedInfluencer: Influencer = {
-      ...influencer,
-      price: data.price,
+    const updatedProfileData: Partial<Influencer> = {
       bio: data.bio,
       socials: {
         instagram: data.instagram,
@@ -67,7 +61,7 @@ export default function ProfileSettingsForm({ influencer, onProfileUpdate }: Pro
         tiktok: data.tiktok,
       },
     };
-    onProfileUpdate(updatedInfluencer);
+    onProfileUpdate(updatedProfileData);
 
     toast({
       title: 'Profile Updated!',
@@ -79,26 +73,11 @@ export default function ProfileSettingsForm({ influencer, onProfileUpdate }: Pro
     <Card>
       <CardHeader>
         <CardTitle>Manage Your Profile</CardTitle>
-        <CardDescription>Update your public information and pricing.</CardDescription>
+        <CardDescription>Update your public information and social links.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Video Price ($)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="Enter your price" {...field} />
-                  </FormControl>
-                  <FormDescription>This is the price fans will pay for a personalized video.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <FormField
               control={form.control}
               name="bio"
@@ -127,9 +106,9 @@ export default function ProfileSettingsForm({ influencer, onProfileUpdate }: Pro
                   name="instagram"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Instagram Handle</FormLabel>
+                      <FormLabel>Instagram URL</FormLabel>
                       <FormControl>
-                        <Input placeholder="your_instagram" {...field} />
+                        <Input placeholder="https://instagram.com/..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -140,9 +119,9 @@ export default function ProfileSettingsForm({ influencer, onProfileUpdate }: Pro
                   name="twitter"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Twitter Handle</FormLabel>
+                      <FormLabel>Twitter/X URL</FormLabel>
                       <FormControl>
-                        <Input placeholder="YourTwitter" {...field} />
+                        <Input placeholder="https://x.com/..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -153,9 +132,9 @@ export default function ProfileSettingsForm({ influencer, onProfileUpdate }: Pro
                   name="youtube"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>YouTube Channel</FormLabel>
+                      <FormLabel>YouTube Channel URL</FormLabel>
                       <FormControl>
-                        <Input placeholder="@YourChannel" {...field} />
+                        <Input placeholder="https://youtube.com/..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -166,9 +145,9 @@ export default function ProfileSettingsForm({ influencer, onProfileUpdate }: Pro
                   name="tiktok"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>TikTok Handle</FormLabel>
+                      <FormLabel>TikTok URL</FormLabel>
                       <FormControl>
-                        <Input placeholder="@your.tiktok" {...field} />
+                        <Input placeholder="https://tiktok.com/..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -15,11 +15,18 @@ export interface Review {
 
 export type InfluencerStatus = 'Pending' | 'Approved' | 'Rejected';
 
+export interface Service {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+}
+
 export interface Influencer {
   id: string;
   name: string;
   category: string;
-  price: number;
+  services: Service[];
   bio: string;
   imageUrl: string;
   'data-ai-hint'?: string;
@@ -33,6 +40,8 @@ export type OrderStatus = 'Pending' | 'In Progress' | 'Completed' | 'Rejected';
 export interface Order {
   id: string;
   influencerId: string;
+  serviceId: string;
+  price: number;
   fanName: string;
   occasion: string;
   description: string;

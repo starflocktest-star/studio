@@ -55,7 +55,7 @@ export default function InfluencersTable({ influencers: initialInfluencers }: In
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Price</TableHead>
+              <TableHead className="text-right">Services</TableHead>
               <TableHead className="text-center">Reviews</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -79,7 +79,7 @@ export default function InfluencersTable({ influencers: initialInfluencers }: In
                     {influencer.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right">${influencer.price}</TableCell>
+                <TableCell className="text-right">{influencer.services.length}</TableCell>
                 <TableCell className="text-center">{influencer.reviews.length}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>

@@ -20,6 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { LogIn } from 'lucide-react';
+import type { Service } from '@/lib/types';
 
 const formSchema = z.object({
   fanName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -28,11 +29,12 @@ const formSchema = z.object({
 });
 
 interface RequestVideoDialogProps {
-  price: number;
+  service: Service;
   influencerName: string;
+  triggerButton?: React.ReactNode;
 }
 
-export default function RequestVideoDialog({ price, influencerName }: RequestVideoDialogProps) {
+export default function RequestVideoDialog({ service, influencerName, triggerButton }: RequestVideoDialogProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   // Mock authentication state. In a real app, you'd use a context or state manager.
@@ -41,6 +43,10 @@ export default function RequestVideoDialog({ price, influencerName }: RequestVid
 
   useEffect(() => {
     setIsClient(true);
+    // In a real app, this would be determined by a proper auth hook/provider
+    if (typeof window !== 'undefined') {
+      setIsLoggedIn(true); // Simulate logged in for demonstration
+    }
   }, []);
 
 
@@ -54,10 +60,10 @@ export default function RequestVideoDialog({ price, influencerName }: RequestVid
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('Video request submitted:', values);
+    console.log('Video request submitted for service', service.name, ':', values);
     toast({
       title: 'Request Submitted!',
-      description: `Your request to ${influencerName} has been sent successfully.`,
+      description: `Your request for "${service.name}" from ${influencerName} has been sent.`,
     });
     setOpen(false);
     form.reset();
@@ -65,15 +71,15 @@ export default function RequestVideoDialog({ price, influencerName }: RequestVid
 
   if (!isClient) {
     return (
-       <Button size="lg" className="w-full md:w-auto bg-accent hover:bg-accent/90 text-white font-bold" disabled>
-          Request for ${price}
+       <Button size="sm" className="bg-accent hover:bg-accent/90 text-white font-bold" disabled>
+          Request for ${service.price}
         </Button>
     )
   }
 
   if (!isLoggedIn) {
     return (
-      <Button asChild size="lg" className="w-full md:w-auto font-bold">
+      <Button asChild size="sm" className="font-bold">
         <Link href="/login">
             <LogIn /> Login to Request
         </Link>
@@ -84,15 +90,17 @@ export default function RequestVideoDialog({ price, influencerName }: RequestVid
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" className="w-full md:w-auto bg-accent hover:bg-accent/90 text-white font-bold">
-          Request for ${price}
-        </Button>
+        {triggerButton || (
+          <Button size="sm" className="bg-accent hover:bg-accent/90 text-white font-bold">
+            Request for ${service.price}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Request a video from {influencerName}</DialogTitle>
+          <DialogTitle>Request: {service.name}</DialogTitle>
           <DialogDescription>
-            Fill out the details below for your personalized video.
+            Fill out the details below for your personalized video from {influencerName}. The price for this service is ${service.price}.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -138,7 +146,7 @@ export default function RequestVideoDialog({ price, influencerName }: RequestVid
             />
             <DialogFooter>
               <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-white">
-                Submit Request
+                Submit Request for ${service.price}
               </Button>
             </DialogFooter>
           </form>

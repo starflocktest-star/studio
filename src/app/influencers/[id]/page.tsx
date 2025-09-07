@@ -1,14 +1,13 @@
 import { influencers } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Instagram, Twitter, Youtube } from 'lucide-react';
 import StarIcon from '@/components/icons/StarIcon';
 import { Separator } from '@/components/ui/separator';
 import RequestVideoDialog from '@/components/orders/RequestVideoDialog';
-import type { Review } from '@/lib/types';
-import { cn } from '@/lib/utils';
+import type { Review, Service } from '@/lib/types';
 
 const TiktokIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -84,25 +83,37 @@ export default function InfluencerProfilePage({ params }: { params: { id: string
 
         <div className="md:col-span-2">
           <Card className="mb-6">
-            <CardContent className="p-6 flex flex-col md:flex-row justify-between items-center">
-              <div>
-                <CardTitle>Personalized Video</CardTitle>
-                <p className="text-muted-foreground mt-1">Get a custom video for any occasion!</p>
-              </div>
-              <div className="mt-4 md:mt-0">
-                <RequestVideoDialog price={influencer.price} influencerName={influencer.name} />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
             <CardContent className="p-6">
               <h2 className="text-2xl font-headline font-semibold mb-4">About {influencer.name}</h2>
               <p className="text-muted-foreground leading-relaxed">{influencer.bio}</p>
             </CardContent>
           </Card>
+          
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Services</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {influencer.services.length > 0 ? (
+                    influencer.services.map((service: Service, index) => (
+                        <div key={service.id}>
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h3 className="font-semibold">{service.name}</h3>
+                                    <p className="text-sm text-muted-foreground">{service.description}</p>
+                                </div>
+                                <RequestVideoDialog service={service} influencerName={influencer.name} />
+                            </div>
+                           {index < influencer.services.length - 1 && <Separator className="mt-4" />}
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-muted-foreground text-center py-4">This influencer is not currently offering any services.</p>
+                )}
+            </CardContent>
+          </Card>
 
-           <Card className="mt-6">
+           <Card>
             <CardHeader>
               <CardTitle>Reviews</CardTitle>
             </CardHeader>

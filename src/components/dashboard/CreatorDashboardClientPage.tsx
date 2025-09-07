@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import type { Order, Influencer, OrderStatus } from '@/lib/types';
+import type { Order, Influencer, OrderStatus, Service } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, Upload, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ProfileSettingsForm from './ProfileSettingsForm';
+import ServicesSettings from './ServicesSettings';
 
 interface CreatorDashboardClientPageProps {
   orders: Order[];
@@ -40,23 +41,32 @@ export default function CreatorDashboardClientPage({ orders: initialOrders, infl
     });
   }
   
-  const handleProfileUpdate = (updatedProfile: Influencer) => {
-    setInfluencer(updatedProfile);
+  const handleProfileUpdate = (updatedProfileData: Partial<Influencer>) => {
+    const updatedInfluencer = { ...influencer, ...updatedProfileData };
+    setInfluencer(updatedInfluencer);
+  }
+  
+  const handleServicesUpdate = (updatedServices: Service[]) => {
+    const updatedInfluencer = { ...influencer, services: updatedServices };
+    setInfluencer(updatedInfluencer);
   }
 
   const OrderCard = ({ order }: { order: Order }) => {
-    const influencerForOrder = influencers.find(i => i.id === order.influencerId);
-    if (!influencerForOrder) return null;
+    const service = influencer.services.find(s => s.id === order.serviceId);
+    if (!service) return null;
     
     return (
       <Card>
         <CardHeader>
           <div className="flex justify-between items-start">
             <div>
-              <CardTitle className="font-headline text-lg">For {influencerForOrder.name}</CardTitle>
+              <CardTitle className="font-headline text-lg">{service.name}</CardTitle>
               <CardDescription>Request from {order.fanName} on {order.requestDate}</CardDescription>
             </div>
-            <Image src={influencerForOrder.imageUrl} alt={influencerForOrder.name} width={64} height={64} className="rounded-full" data-ai-hint={influencerForOrder['data-ai-hint']}/>
+             <div className='text-right'>
+                <p className="text-lg font-bold">${order.price}</p>
+                <Badge variant="secondary">{influencer.name}</Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -104,17 +114,21 @@ export default function CreatorDashboardClientPage({ orders: initialOrders, infl
 
   return (
     <Tabs defaultValue="pending" className="w-full">
-      <TabsList className="grid w-full grid-cols-5">
+      <TabsList className="grid w-full grid-cols-6">
         <TabsTrigger value="pending">Pending</TabsTrigger>
         <TabsTrigger value="in-progress">In Progress</TabsTrigger>
         <TabsTrigger value="completed">Completed</TabsTrigger>
         <TabsTrigger value="rejected">Rejected</TabsTrigger>
+        <TabsTrigger value="services">Services</TabsTrigger>
         <TabsTrigger value="profile">Profile</TabsTrigger>
       </TabsList>
       <TabsContent value="pending">{renderOrders('Pending')}</TabsContent>
       <TabsContent value="in-progress">{renderOrders('In Progress')}</TabsContent>
       <TabsContent value="completed">{renderOrders('Completed')}</TabsContent>
       <TabsContent value="rejected">{renderOrders('Rejected')}</TabsContent>
+       <TabsContent value="services">
+        <ServicesSettings services={influencer.services} onServicesUpdate={handleServicesUpdate} />
+      </TabsContent>
       <TabsContent value="profile">
         <ProfileSettingsForm influencer={influencer} onProfileUpdate={handleProfileUpdate} />
       </TabsContent>

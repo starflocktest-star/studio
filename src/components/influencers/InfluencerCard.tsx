@@ -11,6 +11,10 @@ interface InfluencerCardProps {
 }
 
 export default function InfluencerCard({ influencer }: InfluencerCardProps) {
+  const startingPrice = influencer.services.length > 0
+    ? Math.min(...influencer.services.map(s => s.price))
+    : null;
+
   return (
     <Card className="flex flex-col overflow-hidden transition-transform transform hover:scale-105 hover:shadow-xl duration-300 bg-card border-border">
       <CardHeader className="p-0">
@@ -31,10 +35,14 @@ export default function InfluencerCard({ influencer }: InfluencerCardProps) {
         <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{influencer.bio}</p>
       </CardContent>
       <CardFooter className="p-4 flex justify-between items-center bg-secondary/50">
-        <p className="text-lg font-bold text-primary">${influencer.price}</p>
+        {startingPrice !== null ? (
+          <p className="text-lg font-bold text-primary">Starts at ${startingPrice}</p>
+        ) : (
+          <p className="text-sm text-muted-foreground">No services offered</p>
+        )}
         <Button asChild size="sm" variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10">
           <Link href={`/influencers/${influencer.id}`}>
-            Book Now <ArrowRight className="ml-2 h-4 w-4" />
+            View Services <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
       </CardFooter>
