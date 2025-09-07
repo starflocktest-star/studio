@@ -22,12 +22,16 @@ import Link from 'next/link';
 import { LogIn, Paperclip, X } from 'lucide-react';
 import type { Service } from '@/lib/types';
 import Image from 'next/image';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const formSchema = z.object({
   fanName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   occasion: z.string().min(3, { message: 'Occasion is required.' }),
   description: z.string().min(10, { message: 'Please provide more details (min 10 characters).' }),
   attachment: z.any().optional(),
+  paymentMethod: z.enum(['razorpay', 'payu'], {
+    required_error: 'Please select a payment method.',
+  }),
 });
 
 interface RequestVideoDialogProps {
@@ -84,7 +88,7 @@ export default function RequestVideoDialog({ service, influencerName, triggerBut
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log('Video request submitted for service', service.name, ':', values);
     toast({
-      title: 'Request Submitted!',
+      title: 'Payment Successful!',
       description: `Your request for "${service.name}" from ${influencerName} has been sent.`,
     });
     setOpen(false);
@@ -205,10 +209,41 @@ export default function RequestVideoDialog({ service, influencerName, triggerBut
               </div>
             )}
 
+            <FormField
+              control={form.control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Payment Method</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex space-x-4 pt-2"
+                    >
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="razorpay" />
+                        </FormControl>
+                        <FormLabel className="font-normal">Razorpay</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="payu" />
+                        </FormControl>
+                        <FormLabel className="font-normal">PayU</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
 
             <DialogFooter>
               <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-white">
-                Submit Request for ₹{service.price}
+                Proceed to Pay ₹{service.price}
               </Button>
             </DialogFooter>
           </form>
