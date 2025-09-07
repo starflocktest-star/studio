@@ -77,9 +77,11 @@ export default function Header() {
           <span>StarConnect</span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-6">
-          <NavLinks />
-        </div>
+        {(!isLoggedIn || userRole !== 'influencer') && (
+          <div className="hidden md:flex items-center gap-6">
+            <NavLinks />
+          </div>
+        )}
 
         <div className="flex items-center gap-2">
             {isClient && (
@@ -139,7 +141,9 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="bg-background">
                 <div className="flex flex-col gap-6 pt-10">
+                  {(!isLoggedIn || userRole !== 'influencer') && (
                     <NavLinks className="flex-col text-lg items-start" />
+                  )}
                      {isClient && isLoggedIn && (
                        userRole === 'fan' ? (
                         <Link href="/dashboard" className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
