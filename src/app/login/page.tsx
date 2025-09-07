@@ -26,7 +26,7 @@ const loginFormSchema = z.object({
   password: z.string().min(1, {
     message: 'Password is required.',
   }),
-  role: z.enum(['fan', 'influencer'], {
+  role: z.enum(['fan', 'influencer', 'admin'], {
     required_error: 'You need to select a role.',
   }),
 });
@@ -58,7 +58,10 @@ export default function LoginPage() {
     // Here we simulate the redirect based on role.
     if (data.role === 'influencer') {
       router.push('/creator-dashboard');
-    } else {
+    } else if (data.role === 'admin') {
+      router.push('/admin');
+    }
+    else {
       router.push('/dashboard');
     }
   }
@@ -122,6 +125,12 @@ export default function LoginPage() {
                             <RadioGroupItem value="influencer" />
                           </FormControl>
                           <FormLabel className="font-normal">Influencer</FormLabel>
+                        </FormItem>
+                         <FormItem className="flex items-center space-x-2 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="admin" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Admin</FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>

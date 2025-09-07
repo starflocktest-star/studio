@@ -4,8 +4,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { LogIn, Menu, Star, User, LayoutDashboard, LogOut, Video } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { LogIn, Menu, Star, User, LayoutDashboard, LogOut, Video, ShieldCheck } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import {
@@ -25,10 +25,11 @@ const navLinks = [
   { href: '/register', label: 'Become a Star'},
 ];
 
-type UserRole = 'fan' | 'influencer';
+type UserRole = 'fan' | 'influencer' | 'admin';
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   // Mock authentication state. In a real app, you'd use a context or state manager.
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>('fan');
@@ -44,11 +45,19 @@ export default function Header() {
     } else if (pathname.startsWith('/dashboard')) {
         setIsLoggedIn(true);
         setUserRole('fan');
+    } else if (pathname.startsWith('/admin')) {
+        setIsLoggedIn(true);
+        setUserRole('admin');
     } else if (pathname.startsWith('/login') || pathname.startsWith('/signup')) {
         setIsLoggedIn(false);
     }
 
   }, [pathname]);
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    router.push('/');
+  }
 
 
   const NavLinks = ({ className, onLinkClick }: { className?: string, onLinkClick?: () => void }) => (
@@ -100,22 +109,28 @@ export default function Header() {
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">My Account</p>
                         <p className="text-xs leading-none text-muted-foreground">
-                          {userRole === 'fan' ? 'user@example.com' : 'influencer@example.com'}
+                          {userRole}@example.com
                         </p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                     {userRole === 'fan' ? (
+                     {userRole === 'fan' && (
                         <DropdownMenuItem asChild>
                             <Link href="/dashboard"><LayoutDashboard/>My Requests</Link>
                         </DropdownMenuItem>
-                     ) : (
+                     )}
+                      {userRole === 'influencer' && (
                         <DropdownMenuItem asChild>
                             <Link href="/creator-dashboard"><Video/>Creator Dashboard</Link>
                         </DropdownMenuItem>
                      )}
+                      {userRole === 'admin' && (
+                        <DropdownMenuItem asChild>
+                            <Link href="/admin"><ShieldCheck/>Admin Panel</Link>
+                        </DropdownMenuItem>
+                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>
+                    <DropdownMenuItem onClick={handleLogout}>
                       <LogOut /> Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -145,15 +160,26 @@ export default function Header() {
                     <NavLinks className="flex-col text-lg items-start" />
                   )}
                      {isClient && isLoggedIn && (
-                       userRole === 'fan' ? (
-                        <Link href="/dashboard" className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
-                          My Requests
-                        </Link>
-                       ) : (
-                        <Link href="/creator-dashboard" className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
-                            Creator Dashboard
-                        </Link>
-                       )
+                       <>
+                        {userRole === 'fan' && (
+                          <Link href="/dashboard" className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
+                            My Requests
+                          </Link>
+                        )}
+                        {userRole === 'influencer' && (
+                          <Link href="/creator-dashboard" className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
+                              Creator Dashboard
+                          </Link>
+                        )}
+                         {userRole === 'admin' && (
+                          <Link href="/admin" className="text-lg font-medium text-muted-foreground transition-colors hover:text-primary">
+                              Admin Panel
+                          </Link>
+                        )}
+                        <Button variant="outline" onClick={handleLogout} className="w-full justify-start text-lg font-medium text-muted-foreground">
+                          <LogOut /> Sign Out
+                        </Button>
+                       </>
                      )}
                 </div>
             </SheetContent>
