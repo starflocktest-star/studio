@@ -95,7 +95,7 @@ export default function RequestVideoDialog({ service, influencerName, triggerBut
   if (!isClient) {
     return (
        <Button size="sm" className="bg-accent hover:bg-accent/90 text-white font-bold" disabled>
-          Request for ${service.price}
+          Request for ₹{service.price}
         </Button>
     )
   }
@@ -115,7 +115,7 @@ export default function RequestVideoDialog({ service, influencerName, triggerBut
       <DialogTrigger asChild>
         {triggerButton || (
           <Button size="sm" className="bg-accent hover:bg-accent/90 text-white font-bold">
-            Request for ${service.price}
+            Request for ₹{service.price}
           </Button>
         )}
       </DialogTrigger>
@@ -123,7 +123,7 @@ export default function RequestVideoDialog({ service, influencerName, triggerBut
         <DialogHeader>
           <DialogTitle>Request: {service.name}</DialogTitle>
           <DialogDescription>
-            Fill out the details below for your personalized video from {influencerName}. The price for this service is ${service.price}.
+            Fill out the details below for your personalized video from {influencerName}. The price for this service is ₹{service.price}.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -208,7 +208,7 @@ export default function RequestVideoDialog({ service, influencerName, triggerBut
 
             <DialogFooter>
               <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-white">
-                Submit Request for ${service.price}
+                Submit Request for ₹{service.price}
               </Button>
             </DialogFooter>
           </form>

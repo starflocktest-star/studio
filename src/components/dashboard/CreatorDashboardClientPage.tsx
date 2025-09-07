@@ -64,7 +64,7 @@ export default function CreatorDashboardClientPage({ orders: initialOrders, infl
               <CardDescription>Request from {order.fanName} on {order.requestDate}</CardDescription>
             </div>
              <div className='text-right'>
-                <p className="text-lg font-bold">${order.price}</p>
+                <p className="text-lg font-bold">₹{order.price}</p>
                 <Badge variant="secondary">{influencer.name}</Badge>
             </div>
           </div>

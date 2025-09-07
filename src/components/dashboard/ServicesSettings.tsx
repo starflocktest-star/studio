@@ -26,7 +26,7 @@ const serviceSchema = z.object({
   id: z.string(),
   name: z.string().min(3, 'Service name must be at least 3 characters.'),
   description: z.string().min(10, 'Description must be at least 10 characters.'),
-  price: z.coerce.number().min(1, 'Price must be at least $1.'),
+  price: z.coerce.number().min(1, 'Price must be at least ₹1.'),
 });
 
 const servicesFormSchema = z.object({
@@ -111,9 +111,9 @@ export default function ServicesSettings({ services, onServicesUpdate }: Service
                                 name={`services.${index}.price`}
                                 render={({ field }) => (
                                     <FormItem>
-                                    <FormLabel>Price ($)</FormLabel>
+                                    <FormLabel>Price (₹)</FormLabel>
                                     <FormControl>
-                                        <Input type="number" placeholder="50" {...field} />
+                                        <Input type="number" placeholder="4000" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>

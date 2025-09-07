@@ -36,7 +36,7 @@ export default function InfluencerCard({ influencer }: InfluencerCardProps) {
       </CardContent>
       <CardFooter className="p-4 flex justify-between items-center bg-secondary/50">
         {startingPrice !== null ? (
-          <p className="text-lg font-bold text-primary">Starts at ${startingPrice}</p>
+          <p className="text-lg font-bold text-primary">Starts at ₹{startingPrice}</p>
         ) : (
           <p className="text-sm text-muted-foreground">No services offered</p>
         )}
