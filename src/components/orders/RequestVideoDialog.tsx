@@ -15,17 +15,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LogIn } from 'lucide-react';
+import { LogIn, Paperclip, X } from 'lucide-react';
 import type { Service } from '@/lib/types';
+import Image from 'next/image';
 
 const formSchema = z.object({
   fanName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   occasion: z.string().min(3, { message: 'Occasion is required.' }),
   description: z.string().min(10, { message: 'Please provide more details (min 10 characters).' }),
+  attachment: z.any().optional(),
 });
 
 interface RequestVideoDialogProps {
@@ -37,18 +39,17 @@ interface RequestVideoDialogProps {
 export default function RequestVideoDialog({ service, influencerName, triggerButton }: RequestVideoDialogProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  // Mock authentication state. In a real app, you'd use a context or state manager.
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [fileType, setFileType] = useState<string | null>(null);
 
   useEffect(() => {
     setIsClient(true);
-    // In a real app, this would be determined by a proper auth hook/provider
     if (typeof window !== 'undefined') {
-      setIsLoggedIn(true); // Simulate logged in for demonstration
+      setIsLoggedIn(true);
     }
   }, []);
-
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,6 +60,27 @@ export default function RequestVideoDialog({ service, influencerName, triggerBut
     },
   });
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setFileType(file.type);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFilePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setFilePreview(null);
+      setFileType(null);
+    }
+  };
+  
+  const clearFile = () => {
+      setFilePreview(null);
+      setFileType(null);
+      form.setValue('attachment', null);
+  }
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log('Video request submitted for service', service.name, ':', values);
     toast({
@@ -67,6 +89,7 @@ export default function RequestVideoDialog({ service, influencerName, triggerBut
     });
     setOpen(false);
     form.reset();
+    clearFile();
   }
 
   if (!isClient) {
@@ -144,6 +167,45 @@ export default function RequestVideoDialog({ service, influencerName, triggerBut
                 </FormItem>
               )}
             />
+             <FormField
+              control={form.control}
+              name="attachment"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Attach Image/Video (Optional)</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                        <Button asChild variant="outline" className="w-full">
+                            <label htmlFor="file-upload" className="cursor-pointer">
+                                <Paperclip /> {filePreview ? 'Change file' : 'Choose file'}
+                            </label>
+                        </Button>
+                        <Input id="file-upload" type="file" {...field} onChange={handleFileChange} className="sr-only" accept="image/*,video/*" />
+                    </div>
+                  </FormControl>
+                   <FormDescription>
+                    Add a reference photo or a short video clip.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {filePreview && (
+              <div className="relative mt-4 border rounded-md p-2">
+                 <Button variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6 z-10 bg-black/50 hover:bg-black/70 text-white" onClick={clearFile}>
+                    <X className="h-4 w-4" />
+                </Button>
+                {fileType?.startsWith('image/') && (
+                    <Image src={filePreview} alt="File preview" width={400} height={300} className="rounded-md object-contain max-h-48 w-full" />
+                )}
+                {fileType?.startsWith('video/') && (
+                  <video src={filePreview} controls className="rounded-md max-h-48 w-full" />
+                )}
+              </div>
+            )}
+
+
             <DialogFooter>
               <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-white">
                 Submit Request for ${service.price}
