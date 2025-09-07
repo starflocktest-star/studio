@@ -11,24 +11,24 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
       <section className="text-center mb-16 md:mb-24">
-        <h1 className="text-4xl md:text-6xl font-headline font-bold text-gray-800 mb-4 tracking-tight">
-          Connect with Your Favorite Stars
+        <h1 className="text-4xl md:text-6xl font-headline font-extrabold text-foreground mb-4 tracking-tight">
+          Book Personalized Video Messages From Your Favourite Stars
         </h1>
-        <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
           Get personalized video messages from influencers, artists, and creators for any occasion.
         </p>
         <div className="flex justify-center gap-4">
-          <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-white font-bold">
+          <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
             <Link href="/influencers">Browse Influencers</Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 hover:text-primary">
-            <Link href="/register">For Influencers</Link>
+            <Link href="/register">For Business</Link>
           </Button>
         </div>
       </section>
 
       <section>
-        <h2 className="text-3xl font-headline font-bold text-center text-gray-800 mb-10">
+        <h2 className="text-3xl font-headline font-bold text-center text-foreground mb-10">
           Featured Influencers
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">

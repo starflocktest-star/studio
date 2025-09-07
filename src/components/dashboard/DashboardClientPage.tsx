@@ -58,10 +58,10 @@ export default function DashboardClientPage({ orders: initialOrders, influencers
         <CardFooter className="flex justify-between items-center">
             <Badge variant={order.status === 'Completed' ? 'default' : order.status === 'Pending' ? 'secondary' : 'destructive'} 
                 className={cn({
-                    'bg-green-100 text-green-800': order.status === 'Completed',
-                    'bg-yellow-100 text-yellow-800': order.status === 'In Progress',
-                    'bg-blue-100 text-blue-800': order.status === 'Pending',
-                    'bg-red-100 text-red-800': order.status === 'Rejected',
+                    'bg-green-500/10 text-green-400 border-green-500/20': order.status === 'Completed',
+                    'bg-yellow-500/10 text-yellow-400 border-yellow-500/20': order.status === 'In Progress',
+                    'bg-blue-500/10 text-blue-400 border-blue-500/20': order.status === 'Pending',
+                    'bg-red-500/10 text-red-400 border-red-500/20': order.status === 'Rejected',
                 })}
             >
                 {order.status}

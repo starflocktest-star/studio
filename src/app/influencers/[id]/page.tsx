@@ -43,7 +43,7 @@ export default function InfluencerProfilePage({ params }: { params: { id: string
       if (i <= rating) {
         stars.push(<StarIcon key={i} fill="full" className="w-5 h-5" />);
       } else {
-        stars.push(<StarIcon key={i} fill="none" className="w-5 h-5 text-gray-300" />);
+        stars.push(<StarIcon key={i} fill="none" className="w-5 h-5 text-gray-600" />);
       }
     }
     return stars;
@@ -73,10 +73,10 @@ export default function InfluencerProfilePage({ params }: { params: { id: string
                 <span className="text-sm text-muted-foreground">({influencer.reviews.length} reviews)</span>
               </div>
               <div className="flex gap-4 mt-6">
-                {influencer.socials.instagram && <a href={influencer.socials.instagram} target="_blank" rel="noopener noreferrer"><Instagram className="w-6 h-6 text-gray-600 hover:text-primary"/></a>}
-                {influencer.socials.twitter && <a href={influencer.socials.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="w-6 h-6 text-gray-600 hover:text-primary"/></a>}
-                {influencer.socials.youtube && <a href={influencer.socials.youtube} target="_blank" rel="noopener noreferrer"><Youtube className="w-6 h-6 text-gray-600 hover:text-primary"/></a>}
-                {influencer.socials.tiktok && <a href={influencer.socials.tiktok} target="_blank" rel="noopener noreferrer"><TiktokIcon className="w-6 h-6 text-gray-600 hover:text-primary"/></a>}
+                {influencer.socials.instagram && <a href={influencer.socials.instagram} target="_blank" rel="noopener noreferrer"><Instagram className="w-6 h-6 text-muted-foreground hover:text-primary"/></a>}
+                {influencer.socials.twitter && <a href={influencer.socials.twitter} target="_blank" rel="noopener noreferrer"><Twitter className="w-6 h-6 text-muted-foreground hover:text-primary"/></a>}
+                {influencer.socials.youtube && <a href={influencer.socials.youtube} target="_blank" rel="noopener noreferrer"><Youtube className="w-6 h-6 text-muted-foreground hover:text-primary"/></a>}
+                {influencer.socials.tiktok && <a href={influencer.socials.tiktok} target="_blank" rel="noopener noreferrer"><TiktokIcon className="w-6 h-6 text-muted-foreground hover:text-primary"/></a>}
               </div>
             </CardContent>
           </Card>
@@ -98,7 +98,7 @@ export default function InfluencerProfilePage({ params }: { params: { id: string
           <Card>
             <CardContent className="p-6">
               <h2 className="text-2xl font-headline font-semibold mb-4">About {influencer.name}</h2>
-              <p className="text-gray-700 leading-relaxed">{influencer.bio}</p>
+              <p className="text-muted-foreground leading-relaxed">{influencer.bio}</p>
             </CardContent>
           </Card>
 
@@ -116,7 +116,7 @@ export default function InfluencerProfilePage({ params }: { params: { id: string
                         <p className="ml-4 font-semibold">{review.fanName}</p>
                         <p className="ml-auto text-sm text-muted-foreground">{review.date}</p>
                       </div>
-                      <p className="text-gray-600">{review.comment}</p>
+                      <p className="text-muted-foreground">{review.comment}</p>
                       {index < influencer.reviews.length - 1 && <Separator className="mt-6" />}
                     </div>
                   ))}
