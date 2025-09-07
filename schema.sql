@@ -1,75 +1,89 @@
--- SQL schema for the StarConnect application
--- This schema is designed for a relational database like MySQL or PostgreSQL.
+-- schema.sql
 
--- Users can be either fans or influencers.
--- The 'role' column distinguishes between them.
+-- Users Table
 CREATE TABLE users (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL, -- In a real app, store a hashed password, not plain text.
-    role ENUM('fan', 'influencer') NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('fan', 'influencer', 'admin') NOT NULL,
+    profile_picture_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Influencers have profiles and specific details.
--- This table links to the 'users' table via a foreign key.
+-- Influencers Table (Profile information for users with 'influencer' role)
 CREATE TABLE influencers (
-    id VARCHAR(255) PRIMARY KEY,
-    user_id VARCHAR(255) NOT NULL,
+    user_id VARCHAR(255) PRIMARY KEY,
     category VARCHAR(255),
     bio TEXT,
-    image_url VARCHAR(255),
-    status ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending',
+    status ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Social Links Table
+CREATE TABLE social_links (
+    influencer_id VARCHAR(255) PRIMARY KEY,
     instagram_url VARCHAR(255),
     twitter_url VARCHAR(255),
     youtube_url VARCHAR(255),
     tiktok_url VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (influencer_id) REFERENCES influencers(user_id)
 );
 
--- Each influencer can offer multiple services with different prices.
+-- Services Table
 CREATE TABLE services (
     id VARCHAR(255) PRIMARY KEY,
     influencer_id VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    price DECIMAL(10, 2) NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (influencer_id) REFERENCES influencers(id) ON DELETE CASCADE
+    price DECIMAL(10, 2) NOT NULL, -- Price in INR
+    FOREIGN KEY (influencer_id) REFERENCES influencers(user_id)
 );
 
--- Orders represent a fan's request for a service from an influencer.
+-- Orders Table
 CREATE TABLE orders (
     id VARCHAR(255) PRIMARY KEY,
-    fan_id VARCHAR(255) NOT NULL,
+    user_id VARCHAR(255) NOT NULL,
     influencer_id VARCHAR(255) NOT NULL,
     service_id VARCHAR(255) NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL, -- Price in INR
     occasion VARCHAR(255),
     description TEXT,
-    status ENUM('Pending', 'In Progress', 'Completed', 'Rejected') NOT NULL DEFAULT 'Pending',
+    status ENUM('Pending', 'In Progress', 'Completed', 'Rejected') DEFAULT 'Pending',
+    request_date DATE,
     video_url VARCHAR(255),
-    request_date DATE NOT NULL,
+    attachment_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (fan_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (influencer_id) REFERENCES influencers(id) ON DELETE CASCADE,
-    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (influencer_id) REFERENCES influencers(user_id),
+    FOREIGN KEY (service_id) REFERENCES services(id)
 );
 
--- Reviews are left by fans for influencers after an order is completed.
+-- Reviews Table
 CREATE TABLE reviews (
     id VARCHAR(255) PRIMARY KEY,
-    fan_id VARCHAR(255) NOT NULL,
+    order_id VARCHAR(255) NOT NULL,
+    user_id VARCHAR(255) NOT NULL,
     influencer_id VARCHAR(255) NOT NULL,
-    order_id VARCHAR(255) UNIQUE, -- A review is linked to a specific order.
-    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    rating INT CHECK (rating >= 1 AND rating <= 5),
     comment TEXT,
-    review_date DATE NOT NULL,
+    review_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (fan_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (influencer_id) REFERENCES influencers(id) ON DELETE CASCADE,
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (influencer_id) REFERENCES influencers(user_id)
+);
+
+-- Support Tickets Table
+CREATE TABLE support_tickets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    subject VARCHAR(255) NOT NULL,
+    category ENUM('Order Issue', 'Payment Issue', 'Account Issue', 'General Inquiry') NOT NULL,
+    description TEXT NOT NULL,
+    order_id VARCHAR(255),
+    status ENUM('Open', 'In Progress', 'Closed') DEFAULT 'Open',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
